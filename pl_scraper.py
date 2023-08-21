@@ -12,14 +12,14 @@ useragent = True    # Should not be changed!
 
 
 
+
+
+if useragent == True:
+    agent = "pl_scraper"
+else:
+    agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"
+
 def request(url="https://premierleague.com"):
-    
-    if useragent = True:
-        agent = "pl_scraper"
-    else:
-        agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"
-        
-    
     try:
         page = requests.get(url, headers={"User-Agent": agent}).text
         return page
@@ -84,17 +84,13 @@ def matchweek():
             dataend = page.find("</span>", datastart)
             match["teams"]["away"]["tiny"] = page[datastart:dataend]
             
-            matchpage = request(url="https://premierleague.com/match/"+str(match["id"]))
+            matchpage = request(url="https://premierleague.com/match/"+str(match["id"]), headers={"User-Agent": agent})
             matchstart = matchpage.find("<div class=\"mcTabsContainer\" data-script=\"pl_match-centre\" data-widget=\"match-tabs\" data-fixture=")+98
             matchend = matchpage.find("'>", matchstart)
             matchdata = json.loads(matchpage[matchstart:matchend])
             
             match["teams"]["home"] = matchdata["teams"][0]["team"]
             match["teams"]["away"] = matchdata["teams"][1]["team"]
-            
-            #for key in matchdata:
-            #    print(key)
-             #   print(matchdata[key])
             
             match["completeness"] = matchdata["kickoff"]["completeness"]
             
