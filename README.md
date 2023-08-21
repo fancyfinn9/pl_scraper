@@ -62,10 +62,18 @@ Returns information about the current matchweek.
           }
         }
       },
-    'score': {},
+    'score': {
+      'home': 1,
+      'away': 0
+    },
     'id': 93337,
     'timestamp': 1692384300000,
     'completeness': 3
+    'clock': {
+      'secs': 5880,
+      'label': "90 +8'00"
+    },
+    'result': 'H';
   },
   {
     'teams': {
