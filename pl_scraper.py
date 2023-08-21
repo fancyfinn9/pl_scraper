@@ -116,12 +116,10 @@ def matchweek():
     matchweek["matches"] = sorted(matchweek["matches"], key=lambda match: match["timestamp"])
     return matchweek
 
-def fixture(matchid=93337):
+def fixture(matchid):
     matchpage = request(url="https://premierleague.com/match/"+str(matchid))
     matchstart = matchpage.find("<div class=\"mcTabsContainer\" data-script=\"pl_match-centre\" data-widget=\"match-tabs\" data-fixture=")+98
     matchend = matchpage.find("'>", matchstart)
     matchdata = json.loads(matchpage[matchstart:matchend])
             
-    print(matchdata["teams"][0]["team"])
-    print(matchdata["teams"][1]["team"])
-    return True
+    return matchdata
