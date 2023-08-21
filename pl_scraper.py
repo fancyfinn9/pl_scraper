@@ -72,7 +72,7 @@ def matchweek():
             matchdata = json.loads(matchpage[matchstart:matchend])
             
             match["teams"]["home"] = matchdata["teams"][0]["team"]
-            match["teams"]["away"] = matchdata["teams"][0]["team"]
+            match["teams"]["away"] = matchdata["teams"][1]["team"]
             
             matchweek["matches"].append(match)
         else: break
