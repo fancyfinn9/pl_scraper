@@ -11,6 +11,9 @@ Web scraper that scrapes all sorts of data from the Premier League website
 2. At the top of your program, type `import pl_scraper as pl`.
 3. Get Premier League information to your heart's desire!
 
+## Configuration
+Configurable setting can be found in the first couple of lines of the script. They are mainly for developer purposes. Do not change them unless you know what you are doing!
+
 ## Basic functions
 > Please note that this is not a complete list. There may be functions not mentioned here due to them being in active development or because they are mainly for internal use.
 
