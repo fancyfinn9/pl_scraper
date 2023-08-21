@@ -48,7 +48,7 @@ def matchweek():
     while True:
         start = page.find("<a class=\"match-fixture match-fixture--abridged js-match-abridged\"", datastart)
         if start != -1:
-            match = {"teams":{"home":{},"away":{}}}
+            match = {"teams":{"home":{},"away":{}}, "score":{}}
             
             datastart = page.find("data-matchid=\"", start)+14
             dataend = page.find("\"", datastart)
@@ -73,6 +73,29 @@ def matchweek():
             
             match["teams"]["home"] = matchdata["teams"][0]["team"]
             match["teams"]["away"] = matchdata["teams"][1]["team"]
+            
+            #for key in matchdata:
+            #    print(key)
+             #   print(matchdata[key])
+            
+            match["completeness"] = matchdata["kickoff"]["completeness"]
+            
+            try:
+                match["clock"] = matchdata["clock"]
+            except KeyError:
+                match["clock"] = None
+            
+            try:
+                match["result"] = matchdata["outcome"]
+            except KeyError:
+                match["result"] = None
+            
+            try:
+                match["score"]["home"] = matchdata["teams"][0]["score"]
+                match["score"]["away"] = matchdata["teams"][1]["score"]
+            except KeyError:
+                match["score"]["home"] = None
+                match["score"]["away"] = None
             
             matchweek["matches"].append(match)
         else: break
