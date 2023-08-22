@@ -172,29 +172,33 @@ def player(playerid):
     
     searchstart = 0
     while True:
-        searchstart = playerpage.find("<tr class=\"table player-club-history__table-row\">",searchstart)
-        if searchstart != -1:
-            searchstart = playerpage.find("<td class=\"player-club-history__season\"><p>", searchstart)+43
+        start = playerpage.find("<tr class=\"table player-club-history__table-row\">",searchstart)
+        if start != -1:
+            searchstart = playerpage.find("<td class=\"player-club-history__season\"><p>", start)+43
             searchend = playerpage.find("</p></td>", searchstart)
             history["season"] = playerpage[searchstart:searchend]
             
-            searchstart = playerpage.find("<a href=\"/clubs/", searchstart)+16
+            searchstart = playerpage.find("<a href=\"/clubs/", start)+16
             searchend = playerpage.find("/", searchstart)
             history["club"]["id"] = playerpage[searchstart:searchend]
             
-            searchstart = playerpage.find("<td class=\"player-club-history__appearances\">", searchstart)+54
+            searchstart = playerpage.find("<span class=\"player-club-history__team-name player-club-history__team-name--long\">", start)+82
+            searchend = playerpage.find("</span>", searchstart)
+            history["club"]["name"] = playerpage[searchstart:searchend]
+                        
+            searchstart = playerpage.find("<td class=\"player-club-history__appearances\">", start)+54
             searchend = playerpage.find("<span", searchstart)
             history["apps"] = playerpage[searchstart:searchend].strip()
             
-            searchstart = playerpage.find("<span class=\"appearances--sub\">(", searchstart)+32
+            searchstart = playerpage.find("<span class=\"appearances--sub\">(", start)+32
             searchend = playerpage.find(")", searchstart)
             history["subs"] = playerpage[searchstart:searchend]
             
-            searchstart = playerpage.find("<td class=\"player-club-history__goals\">", searchstart)+48
+            searchstart = playerpage.find("<td class=\"player-club-history__goals\">", start)+48
             searchend = playerpage.find("</td>", searchstart)
             history["goals"] = playerpage[searchstart:searchend].strip()
             
-            player["history"].append(history)            
+            player["history"].append(history.copy())
         else: break
 
     
