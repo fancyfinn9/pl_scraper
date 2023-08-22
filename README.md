@@ -82,3 +82,10 @@ Returns information about the current matchweek.
     'teams': {
 ...
 ```
+
+## Legal notice
+This program uses data from the Premier League website.
+
+This program is not affiliated with or endorsed by the Premier League.
+
+The Premier League retains all rights to the data scraped by this program.
