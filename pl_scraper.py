@@ -123,3 +123,79 @@ def fixture(matchid):
     matchdata = json.loads(matchpage[matchstart:matchend])
             
     return matchdata
+
+def player(playerid):
+    player = {"name":{"display":"","first":"","last":"","dob":"","age":0,"height":0,"country":""}, "club":{"club":{"name":"","id":0},"position":"","number":""}, "history":[]}
+    history = {"season":"","club":{"name":"","id":0},"apps":0,"subs":0,"goals":0}
+    
+    playerpage = request(url="https://premierleague.com/players/"+str(playerid)+"/player/overview")
+    
+    datastart = playerpage.find("<img class=\"player-overview__flag-icon\" src=\"https://resources.premierleague.com/premierleague/flags/")+165
+    dataend = playerpage.find("</span>", datastart)
+    player["name"]["country"] = playerpage[datastart:dataend]
+    
+    datastart = playerpage.find("<div class=\"player-header__name-first\">")+39
+    dataend = playerpage.find("</div>", datastart)
+    player["name"]["first"] = playerpage[datastart:dataend].strip()
+    
+    datastart = playerpage.find("<div class=\"player-header__name-last\">")+38
+    dataend = playerpage.find("</div>", datastart)
+    player["name"]["last"] = playerpage[datastart:dataend].strip()
+    
+    player["name"]["display"] = player["name"]["first"]+" "+player["name"]["last"]
+    
+    datastart = playerpage.find("<div class=\"player-overview__label\">Date of Birth</div>")+111
+    dataend = playerpage.find("</div>", datastart)
+    player["name"]["dob"] = playerpage[datastart:dataend].strip()[:10]
+    player["name"]["age"] = playerpage[datastart:dataend].strip()[13:15]
+
+    datastart = playerpage.find("<div class=\"player-overview__label\">Height</div>")+104
+    dataend = playerpage.find("</div>", datastart)
+    player["name"]["height"] = playerpage[datastart:dataend]
+    
+    searchstart = playerpage.find("<div class=\"player-overview__label\">Club</div>")
+    datastart = playerpage.find("/overview\">", searchstart)+13
+    dataend = playerpage.find("<span", datastart)
+    player["club"]["club"]["name"] = playerpage[datastart:dataend].strip()
+    
+    datastart = playerpage.find("<a href=\"/clubs/", searchstart)+16
+    dataend = playerpage.find("/", datastart)
+    player["club"]["club"]["id"] = playerpage[datastart:dataend]
+    
+    datastart = playerpage.find("<div class=\"player-overview__label\">Position</div>")+106
+    dataend = playerpage.find("</div>", datastart)
+    player["club"]["position"] = playerpage[datastart:dataend]
+
+    datastart = playerpage.find("<div class=\"player-header__player-number player-header__player-number--small\">")+78
+    dataend = playerpage.find("</div>", datastart)
+    player["club"]["number"] = playerpage[datastart:dataend]
+    
+    searchstart = 0
+    while True:
+        searchstart = playerpage.find("<tr class=\"table player-club-history__table-row\">",searchstart)
+        if searchstart != -1:
+            searchstart = playerpage.find("<td class=\"player-club-history__season\"><p>", searchstart)+43
+            searchend = playerpage.find("</p></td>", searchstart)
+            history["season"] = playerpage[searchstart:searchend]
+            
+            searchstart = playerpage.find("<a href=\"/clubs/", searchstart)+16
+            searchend = playerpage.find("/", searchstart)
+            history["club"]["id"] = playerpage[searchstart:searchend]
+            
+            searchstart = playerpage.find("<td class=\"player-club-history__appearances\">", searchstart)+54
+            searchend = playerpage.find("<span", searchstart)
+            history["apps"] = playerpage[searchstart:searchend].strip()
+            
+            searchstart = playerpage.find("<span class=\"appearances--sub\">(", searchstart)+32
+            searchend = playerpage.find(")", searchstart)
+            history["subs"] = playerpage[searchstart:searchend]
+            
+            searchstart = playerpage.find("<td class=\"player-club-history__goals\">", searchstart)+48
+            searchend = playerpage.find("</td>", searchstart)
+            history["goals"] = playerpage[searchstart:searchend].strip()
+            
+            player["history"].append(history)            
+        else: break
+
+    
+    return player
