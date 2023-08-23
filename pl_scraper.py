@@ -25,6 +25,7 @@ def request(url="https://premierleague.com"):
         return page
     except requests.exceptions.ConnectionError as e:
         print(f">> Can't connect to \"{url}\"! Please check your internet connection <<")
+        raise Exception("See above")
 
 def raw():
     page = request()
@@ -126,7 +127,8 @@ def fixture(matchid):
 
 def player(playerid):
     player = {"name":{"display":"","first":"","last":"","dob":"","age":0,"height":0,"country":""}, "club":{"club":{"name":"","id":0},"position":"","number":""}, "history":[]}
-    history = {"season":"","club":{"name":"","id":0},"apps":0,"subs":0,"goals":0}
+    history = {"season":"","club":{},"apps":0,"subs":0,"goals":0}
+    club = {}
     
     playerpage = request(url="https://premierleague.com/players/"+str(playerid)+"/player/overview")
     
@@ -177,15 +179,17 @@ def player(playerid):
             searchstart = playerpage.find("<td class=\"player-club-history__season\"><p>", start)+43
             searchend = playerpage.find("</p></td>", searchstart)
             history["season"] = playerpage[searchstart:searchend]
-            
+              
             searchstart = playerpage.find("<a href=\"/clubs/", start)+16
             searchend = playerpage.find("/", searchstart)
-            history["club"]["id"] = playerpage[searchstart:searchend]
+            club["id"] = playerpage[searchstart:searchend]
             
             searchstart = playerpage.find("<span class=\"player-club-history__team-name player-club-history__team-name--long\">", start)+82
             searchend = playerpage.find("</span>", searchstart)
-            history["club"]["name"] = playerpage[searchstart:searchend]
-                        
+            club["name"] = playerpage[searchstart:searchend]
+            
+            history["club"] = club.copy()            
+            
             searchstart = playerpage.find("<td class=\"player-club-history__appearances\">", start)+54
             searchend = playerpage.find("<span", searchstart)
             history["apps"] = playerpage[searchstart:searchend].strip()
