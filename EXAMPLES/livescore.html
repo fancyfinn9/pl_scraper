@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Live Score for --</title>
+	<style>
+	body {
+		text-align: center
+	}
+	</style>
+</head>
+<body>
+
+<h1>pl_score</h1>
+<p>Live football scores powered by pl_scraper</p>
+<br>
+<p id="clock">00:00</p>
+<h5>Events</h5>
+<div id="events"></div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script>
+
+function Loop() {
+	// console.log("Sending request");
+	let request = new XMLHttpRequest();
+	request.open("GET", "http://127.0.0.1:5000/fixture/93332");
+	request.send();
+	request.onload = () => {
+		if (request.status == 200) {
+			$("#errors").append("<br>good");
+			const obj = JSON.parse(request.responseText);
+			document.getElementById("clock").innerHTML = obj.clock.label;
+			document.getElementById("events").innerHTML = "";
+			obj.events.sort(function(a, b){return a.clock.secs-b.clock.secs});
+			for (let i = 0; i < obj.events.length; i++) {
+				document.getElementById("events").innerHTML = document.getElementById("events").innerHTML+"<br><b>"+obj.events[i].clock.label.toString();
+			}
+		} else {
+			$("#errors").append("Error");
+		}
+	}
+	
+}
+
+var interval = self.setInterval(function(){Loop()},10000);
+
+$(document).dblclick(function(){
+  window.clearInterval(interval);
+});
+
+</script>
+</body>
+</html>
