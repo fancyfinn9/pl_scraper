@@ -154,7 +154,7 @@ def matchweek():
         else: break
     matchweek["matches"] = sorted(matchweek["matches"], key=lambda match: match["timestamp"])
     
-    resp = app.make_response(str(matchweek).replace("'", '"'))
+    resp = app.make_response(json.dumps(matchweek))
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
 
@@ -164,14 +164,8 @@ def fixture(matchid):
     matchstart = matchpage.find("<div class=\"mcTabsContainer\" data-script=\"pl_match-centre\" data-widget=\"match-tabs\" data-fixture=")+98
     matchend = matchpage.find("'>", matchstart)
     matchdata = json.loads(matchpage[matchstart:matchend])
-    
-    matchdata["clock"]["label"] = str(matchdata["clock"]["label"]).replace("'", " ")
-    for event in matchdata["events"]:
-        event["clock"]["label"] = event["clock"]["label"].replace("'", " ")
-        print(event)
-        print(event["clock"]["label"])
         
-    resp = app.make_response(str(matchdata).replace("'", '"').replace("False", "\"False\"").replace("True", "\"True\""))
+    resp = app.make_response(json.dumps(matchdata))
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
 
@@ -256,6 +250,6 @@ def player(playerid):
             player["history"].append(history.copy())
         else: break
 
-    resp = app.make_response(str(player).replace("'", '"'))
+    resp = app.make_response(json.dumps(player))
     resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
