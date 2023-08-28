@@ -1,5 +1,19 @@
 import requests
 import json
+from flask import Flask
+
+"""
+THIS IS THE SERVER VERSION OF PL_SCRAPER
+IF YOU WANT TO USE PL_SCRAPER IN A PYTHON SCRIPT OR PROGRAM,
+YOU SHOULD USE THE ORIGINAL PL_SCRAPER VERSION THAT YOU
+CAN IMPORT TO YOUR OWN SCRIPT OR PROGRAM.
+YOU SHOULD ONLY USE THIS SERVER VERSION IF YOU
+WANT TO USE PL_SCRAPER IN CIRCUMSTANCES WHERE IT
+IS EASIER TO USE AN API, SUCH AS IN OTHER LANGUAGES THAN PYTHON.
+
+"""
+
+print("#### PL_SCRAPER - SERVER VERSION ####")
 
 
 
@@ -12,6 +26,25 @@ useragent = True    # Should not be changed!
 
 
 
+
+
+
+
+
+app = Flask(__name__)
+
+
+@app.route("/")
+def home():
+    resp = app.make_response("pl_server is working correctly :)")
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
+
+@app.route("/ping")
+def ping():
+    resp = app.make_response("Pong!")
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
 
 if useragent == True:
@@ -40,6 +73,7 @@ def file():
         f.close()
     return True
 
+@app.route("/teams")
 def teams():
     page = request()
     
@@ -52,8 +86,12 @@ def teams():
             spanend = page.find("</span>", spanstart)
             teams.append(page[spanstart:spanend])
         else: break
-    return teams
+        
+    resp = app.make_response(str(teams).replace("'", '"'))
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
+@app.route("/matchweek")
 def matchweek():
     page = request()
     
@@ -85,7 +123,7 @@ def matchweek():
             dataend = page.find("</span>", datastart)
             match["teams"]["away"]["tiny"] = page[datastart:dataend]
             
-            matchpage = request(url="https://premierleague.com/match/"+str(match["id"]))
+            matchpage = request(url="https://premierleague.com/match/"+str(match["id"]), headers={"User-Agent": agent})
             matchstart = matchpage.find("<div class=\"mcTabsContainer\" data-script=\"pl_match-centre\" data-widget=\"match-tabs\" data-fixture=")+98
             matchend = matchpage.find("'>", matchstart)
             matchdata = json.loads(matchpage[matchstart:matchend])
@@ -115,16 +153,23 @@ def matchweek():
             matchweek["matches"].append(match)
         else: break
     matchweek["matches"] = sorted(matchweek["matches"], key=lambda match: match["timestamp"])
-    return matchweek
+    
+    resp = app.make_response(json.dumps(matchweek))
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
+@app.route("/fixture/<int:matchid>")
 def fixture(matchid):
     matchpage = request(url="https://premierleague.com/match/"+str(matchid))
     matchstart = matchpage.find("<div class=\"mcTabsContainer\" data-script=\"pl_match-centre\" data-widget=\"match-tabs\" data-fixture=")+98
     matchend = matchpage.find("'>", matchstart)
     matchdata = json.loads(matchpage[matchstart:matchend])
-            
-    return matchdata
+        
+    resp = app.make_response(json.dumps(matchdata))
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
+@app.route("/player/<int:playerid>")
 def player(playerid):
     player = {"name":{"display":"","first":"","last":"","dob":"","age":0,"height":0,"country":""}, "club":{"club":{"name":"","id":0},"position":"","number":""}, "history":[]}
     history = {"season":"","club":{},"apps":0,"subs":0,"goals":0}
@@ -205,5 +250,6 @@ def player(playerid):
             player["history"].append(history.copy())
         else: break
 
-    
-    return player
+    resp = app.make_response(json.dumps(player))
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
