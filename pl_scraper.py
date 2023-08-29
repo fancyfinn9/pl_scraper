@@ -137,8 +137,11 @@ def player(playerid):
     player["name"]["country"] = playerpage[datastart:dataend]
     
     datastart = playerpage.find("<div class=\"player-header__name-first\">")+39
-    dataend = playerpage.find("</div>", datastart)
-    player["name"]["first"] = playerpage[datastart:dataend].strip()
+    if datastart-39 == -1:
+        player["name"]["first"] = ""
+    else:
+        dataend = playerpage.find("</div>", datastart)
+        player["name"]["first"] = playerpage[datastart:dataend].strip()
     
     datastart = playerpage.find("<div class=\"player-header__name-last\">")+38
     dataend = playerpage.find("</div>", datastart)
